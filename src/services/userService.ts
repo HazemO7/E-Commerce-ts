@@ -1,6 +1,6 @@
 import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
 // register interface
 interface registerParams {
   email: string;
@@ -18,13 +18,18 @@ export const register = async ({
 }: registerParams) => {
   const findUser = await userModel.findOne({ email });
   if (findUser) {
-    return { data:  "User is exist!" , statusCode: 400};
-  };
+    return { data: "User is exist!", statusCode: 400 };
+  }
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = new userModel({ email, password: hashedPassword, firstName, lastName });
+  const newUser = new userModel({
+    email,
+    password: hashedPassword,
+    firstName,
+    lastName,
+  });
 
   await newUser.save();
-  return {data: newUser, statusCode: 201};
+  return { data: generatJWT({ email, firstName, lastName }), statusCode: 201 };
 };
 
 // login interface
@@ -40,13 +45,24 @@ export const login = async ({ email, password }: loginParams) => {
     return { data: "user or password not correct!", statusCode: 400 };
   }
   const passwordMatch = await bcrypt.compare(password, findUser.password);
-   
+
   if (passwordMatch) {
-    return {data: findUser, statusCode: 200};
+    return {
+      data: generatJWT({
+        email,
+        firsName: findUser.firstName,
+        lastName: findUser.lastName,
+      }),
+      statusCode: 200,
+    };
   }
 
   return {
     data: "user or password not correct!",
     statusCode: 400,
   };
+};
+
+const generatJWT = (data: any) => {
+  jwt.sign(data, "secretkey_veryComplecated", { expiresIn: "1d" });
 };
