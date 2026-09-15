@@ -1,13 +1,15 @@
 import express from "express";
 import { Db } from "mongodb";
 import mongoose from "mongoose";
+import userRouter from "./routes/userRoute.js";
+
 
 const app = express();
 
 //middlware
 app.use(express.json());
 
-
+app.use('/user', userRouter )
 
 //connect DB
 mongoose

@@ -1,11 +1,12 @@
 import userModel from "../models/userModel.js";
+import bcrypt from "bcrypt";
 
 // register interface
 interface registerParams {
-  email: String;
-  password: String;
-  firstName: String;
-  lastName: String;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
 }
 
 // Register function
@@ -17,34 +18,35 @@ export const register = async ({
 }: registerParams) => {
   const findUser = await userModel.findOne({ email });
   if (findUser) {
-    return { error: { message: "User is exist" } };
-  }
-  const newUser = new userModel({ email, password, firstName, lastName });
+    return { data:  "User is exist!" , statusCode: 400};
+  };
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = new userModel({ email, password: hashedPassword, firstName, lastName });
 
   await newUser.save();
-  return newUser;
+  return {data: newUser, statusCode: 201};
 };
 
 // login interface
 interface loginParams {
-  email: String;
-  password: String;
+  email: string;
+  password: string;
 }
 
 // login function
 export const login = async ({ email, password }: loginParams) => {
   const findUser = await userModel.findOne({ email });
   if (!findUser) {
-    return { error: { message: "user or password not correct!" } };
+    return { data: "user or password not correct!", statusCode: 400 };
   }
-  const passwordMatch = password === findUser.password;
+  const passwordMatch = await bcrypt.compare(password, findUser.password);
+   
   if (passwordMatch) {
-    return findUser;
+    return {data: findUser, statusCode: 200};
   }
 
   return {
-    erorr: {
-      message: "user or password not correct!",
-    },
+    data: "user or password not correct!",
+    statusCode: 400,
   };
 };

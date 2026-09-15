@@ -2,10 +2,10 @@ import mongoose, { Schema, Document } from "mongoose";
 
 // interface for user model
 export interface IUser extends Document {
-  firstName: String;
-  lastName: String;
-  password: String;
-  email: String;
+  firstName: string;
+  lastName: string;
+  password: string;
+  email: string;
 }
 
 //create a schema for user
