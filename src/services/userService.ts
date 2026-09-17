@@ -50,7 +50,7 @@ export const login = async ({ email, password }: loginParams) => {
     return {
       data: generatJWT({
         email,
-        firsName: findUser.firstName,
+        firstName: findUser.firstName,
         lastName: findUser.lastName,
       }),
       statusCode: 200,
@@ -64,5 +64,5 @@ export const login = async ({ email, password }: loginParams) => {
 };
 
 const generatJWT = (data: any) => {
-  jwt.sign(data, "secretkey_veryComplecated", { expiresIn: "1d" });
+  return jwt.sign(data, "secretkey_veryComplecated", { expiresIn: "1d" });
 };
